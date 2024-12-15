@@ -1,0 +1,7 @@
+prophet
+prometheus_client
+requests
+pandas
+prometheus_api_client
+joblib
+numpy

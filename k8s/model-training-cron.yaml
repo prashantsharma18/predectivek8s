@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: model-training-job
+  namespace: default
+spec:
+  schedule: "0 * * * *" # Runs every hour
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid # Prevent concurrent runs of the job
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: model-training
+            image: model-training:1 # Replace with your built Docker image
+            command: ["python", "prometheus_model_training.py"]
+            env:
+            - name: PROMETHEUS_URL
+              value: "http://prometheus-kube-prometheus-prometheus.monitoring:9090" # Replace with Prometheus service URL
+            - name: MODEL_DIR
+              value: "/models"
+            volumeMounts:
+            - name: model-storage
+              mountPath: /models
+          restartPolicy: OnFailure
+          volumes:
+          - name: model-storage
+            persistentVolumeClaim:
+              claimName: model-pvc # Replace with your PVC name

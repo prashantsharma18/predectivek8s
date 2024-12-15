@@ -1,0 +1,31 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: predictive-scaler
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: example-app
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 20
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prediction-service.default.svc.cluster.local:8001
+        metricName: predicted_cpu_usage
+        query: predicted_cpu_usage
+        threshold: "75"
+    - type: prometheus
+      metadata:
+        serverAddress: http://prediction-service.default.svc.cluster.local:8001
+        metricName: predicted_memory_usage
+        query: predicted_memory_usage
+        threshold: "500"
+    - type: prometheus
+      metadata:
+        serverAddress: http://prediction-service.default.svc.cluster.local:8001
+        metricName: predicted_request_rate
+        query: predicted_request_rate
+        threshold: "100"

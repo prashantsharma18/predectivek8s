@@ -1,0 +1,5 @@
+prometheus-client
+pandas
+flask
+joblib
+prophet
