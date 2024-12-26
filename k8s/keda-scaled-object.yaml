@@ -1,31 +1,57 @@
+# ScaledObject for service1 (memory-intensive)
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: predictive-scaler
+  name: memory-service-scaler
   namespace: default
 spec:
   scaleTargetRef:
-    name: example-app
+    apiVersion: apps/v1
+    kind: Deployment
+    name: memory-intensive  # This should match your service1 deployment name
   pollingInterval: 30
   cooldownPeriod: 300
   minReplicaCount: 1
-  maxReplicaCount: 20
+  maxReplicaCount: 10
   triggers:
-    - type: prometheus
+    - type: http
       metadata:
-        serverAddress: http://prediction-service.default.svc.cluster.local:8001
-        metricName: predicted_cpu_usage
-        query: predicted_cpu_usage
+        url: http://prediction-service.default.svc.cluster.local:5000/predict/service1/cpu_usage
+        method: "GET"
+        valueLocation: 'value'  # This points to the 'value' field in the prediction response
         threshold: "75"
-    - type: prometheus
+    - type: http
       metadata:
-        serverAddress: http://prediction-service.default.svc.cluster.local:8001
-        metricName: predicted_memory_usage
-        query: predicted_memory_usage
+        url: http://prediction-service.default.svc.cluster.local:5000/predict/service1/memory_usage
+        method: "GET"
+        valueLocation: 'value'
         threshold: "500"
-    - type: prometheus
+---
+# ScaledObject for service2 (cpu-intensive)
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cpu-service-scaler
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cpu-intensive  # This should match your service2 deployment name
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+    - type: http
       metadata:
-        serverAddress: http://prediction-service.default.svc.cluster.local:8001
-        metricName: predicted_request_rate
-        query: predicted_request_rate
-        threshold: "100"
+        url: http://prediction-service.default.svc.cluster.local:5000/predict/service2/cpu_usage
+        method: "GET"
+        valueLocation: 'value'
+        threshold: "75"
+    - type: http
+      metadata:
+        url: http://prediction-service.default.svc.cluster.local:5000/predict/service2/memory_usage
+        method: "GET"
+        valueLocation: 'value'
+        threshold: "500"

@@ -14,7 +14,7 @@ spec:
         spec:
           containers:
           - name: model-training
-            image: model-training:1 # Replace with your built Docker image
+            image: model-training:2 # Replace with your built Docker image
             command: ["python", "prometheus_model_training.py"]
             env:
             - name: PROMETHEUS_URL

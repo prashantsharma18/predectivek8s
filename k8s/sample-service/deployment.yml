@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-intensive
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cpu-intensive
+  template:
+    metadata:
+      labels:
+        app: cpu-intensive
+    spec:
+      containers:
+      - name: cpu-intensive
+        image: cpu-intensive:1
+        ports:
+        - containerPort: 5000
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memory-intensive
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memory-intensive
+  template:
+    metadata:
+      labels:
+        app: memory-intensive
+    spec:
+      containers:
+      - name: memory-intensive
+        image: memory-intensive:1
+        ports:
+        - containerPort: 5001
+        - containerPort: 8001
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cpu-intensive
+spec:
+  selector:
+    app: cpu-intensive
+  ports:
+  - name: http
+    port: 5000
+    targetPort: 5000
+  - name: metrics
+    port: 8000
+    targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memory-intensive
+spec:
+  selector:
+    app: memory-intensive
+  ports:
+  - name: http
+    port: 5001
+    targetPort: 5001
+  - name: metrics
+    port: 8001
+    targetPort: 8001
