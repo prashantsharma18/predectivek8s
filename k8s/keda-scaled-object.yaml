@@ -8,23 +8,23 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: memory-intensive  # This should match your service1 deployment name
+    name: memory-intensive
   pollingInterval: 30
   cooldownPeriod: 300
   minReplicaCount: 1
   maxReplicaCount: 10
   triggers:
-    - type: http
+    - type: prometheus
       metadata:
-        url: http://prediction-service.default.svc.cluster.local:5000/predict/service1/cpu_usage
-        method: "GET"
-        valueLocation: 'value'  # This points to the 'value' field in the prediction response
+        serverAddress: http://prediction-service.default.svc.cluster.local:5000
+        metricName: service1_cpu_usage_prediction
+        query: service1_predicted_cpu_usage
         threshold: "75"
-    - type: http
+    - type: prometheus
       metadata:
-        url: http://prediction-service.default.svc.cluster.local:5000/predict/service1/memory_usage
-        method: "GET"
-        valueLocation: 'value'
+        serverAddress: http://prediction-service.default.svc.cluster.local:5000
+        metricName: service1_memory_usage_prediction
+        query: service1_predicted_memory_usage
         threshold: "500"
 ---
 # ScaledObject for service2 (cpu-intensive)
@@ -37,21 +37,21 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: cpu-intensive  # This should match your service2 deployment name
+    name: cpu-intensive
   pollingInterval: 30
   cooldownPeriod: 300
   minReplicaCount: 1
   maxReplicaCount: 10
   triggers:
-    - type: http
+    - type: prometheus
       metadata:
-        url: http://prediction-service.default.svc.cluster.local:5000/predict/service2/cpu_usage
-        method: "GET"
-        valueLocation: 'value'
+        serverAddress: http://prediction-service.default.svc.cluster.local:5000
+        metricName: service2_cpu_usage_prediction
+        query: service2_predicted_cpu_usage
         threshold: "75"
-    - type: http
+    - type: prometheus
       metadata:
-        url: http://prediction-service.default.svc.cluster.local:5000/predict/service2/memory_usage
-        method: "GET"
-        valueLocation: 'value'
+        serverAddress: http://prediction-service.default.svc.cluster.local:5000
+        metricName: service2_memory_usage_prediction
+        query: service2_predicted_memory_usage
         threshold: "500"

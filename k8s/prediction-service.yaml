@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: prediction-service
-        image: prediction-service:1
+        image: prediction-service:4
         ports:
         - containerPort: 5000
         volumeMounts:
